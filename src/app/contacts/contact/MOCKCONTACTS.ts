@@ -277,5 +277,13 @@ export const MOCKCONTACTS: Contact[] = [
       group: null
     }
   ]
+  },
+  {
+    id: '999',
+    name: 'Robert Lowry',
+    email: 'not given',
+    phone: 'not given',
+    imageUrl: '../../../assets/images/mclaughlinm.jpg',
+    group: null
   }
 ];
