@@ -5,6 +5,7 @@ var http = require('http');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var mongoose = require('mongoose');
 
 // import the routing file to handle the default (index) route
 var index = require('./server/routes/app');
@@ -60,6 +61,13 @@ app.use(function(req, res, next) {
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist/cms/browser/index.html'));
 });
+
+mongoose.connect('mongodb+srv://Bobert3001:sa8La2WdgHrmuZJZ@cluster0.f764fad.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0').then(() => {
+  console.log('Connected to database!')
+}).catch(() => {
+  console.log('Connection failed.')
+})
+
 
 // Define the port address and tell express to use this port
 const port = process.env.PORT || '3000';

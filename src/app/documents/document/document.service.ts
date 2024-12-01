@@ -23,7 +23,7 @@ export class DocumentService {
   getDocuments() {
     console.log('Working before the call.')
     this.http.get<Document[]>(
-      'https://cms-project-firebase-default-rtdb.firebaseio.com/documents.json'
+      'http://localhost:3000/documents'
     ).subscribe(
       (documents: Document[]) => {
         console.log('it worked here');
@@ -65,8 +65,14 @@ export class DocumentService {
     if (pos < 0) {
       return;
     }
-    this.documents.splice(pos, 1);
-    this.storeDocuments();
+
+    this.http.delete('http://localhost:3000/documents/' + document._id)
+    .subscribe(
+      (response: Response) => {
+        this.documents.splice(pos, 1);
+        this.storeDocuments();
+      }
+    )
     // OLD CODE WITH EVENT EMITTERS
     // this.documentChangedEvent.emit(this.documents.slice());
   }
@@ -77,8 +83,20 @@ export class DocumentService {
     }
     this.maxDocumentId++;
     newDocument.id = this.maxDocumentId.toString();
-    this.documents.push(newDocument);
-    this.storeDocuments();
+    // POSSIBLE ERROR SITE
+
+    const headers = new HttpHeaders({'Content-Type':'application/json'});
+
+    this.http.post<{message: string, document: Document}> (
+      'http://localhost:3000/documents', newDocument,
+      {headers: headers}
+    ).subscribe(
+      (responseData => {
+        this.documents.push(responseData.document);
+        this.storeDocuments();
+      })
+    )
+
   }
 
   updateDocument(originalDocument: Document, newDocument: Document) {
@@ -90,8 +108,18 @@ export class DocumentService {
       return;
     }
     newDocument.id = originalDocument.id;
-    this.documents[pos] = newDocument;
-    this.storeDocuments();
+    newDocument._id = originalDocument._id;
+
+    const headers = new HttpHeaders({'Content-type': 'application/json'});
+
+    this.http.put('http://localhost:3000/documents/' + originalDocument._id, newDocument, 
+      {headers: headers}
+    ).subscribe(
+      (response: Response) => {
+        this.documents[pos] = newDocument;
+        this.storeDocuments();
+      }
+    )
   }
 
   getMaxId(): number {
